@@ -32,6 +32,10 @@ module PostSets
       tag_array.reject {|tag| tag =~ /\Aorder:/i }
     end
 
+    def has_blank_wiki?
+      tag.present? && !wiki_page.present?
+    end
+
     def wiki_page
       return nil unless tag.present? && tag.wiki_page.present?
       return nil unless !tag.wiki_page.is_deleted? && tag.wiki_page.visible?
@@ -70,6 +74,10 @@ module PostSets
       @post_set_name ||= Tag.has_metatag?(tag_array, :set)
     end
 
+    def has_post_set?
+      is_single_tag? && post_set_name && post_set
+    end
+
     def post_set
       ::PostSet.find_by_shortname(post_set_name)
     end
@@ -86,6 +94,10 @@ module PostSets
       @login_blocked ||= posts.select { |p| p.loginblocked? }
     end
 
+    def deleted_posts
+      @deleted_posts ||= posts.select { |p| p.deleteblocked? }
+    end
+
     def safe_posts
       @safe_posts ||= posts.select { |p| p.safeblocked? && !p.deleteblocked? }
     end
@@ -100,6 +112,15 @@ module PostSets
 
     def use_sequential_paginator?
       unknown_post_count? && !CurrentUser.is_privileged?
+    end
+
+    def get_post_count
+      if %w(json atom xml).include?(format.downcase)
+        # no need to get counts for formats that don't use a paginator
+        return Danbooru.config.blank_tag_search_fast_count
+      else
+        ::Post.fast_count(tag_string)
+      end
     end
 
     def posts

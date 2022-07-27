@@ -12,7 +12,7 @@
     <section>
       <h2>Tags</h2>
 
-      <% if @meta_search.tags.blank? %>
+      <% if @meta_search.tags.empty? %>
         <p>No results</p>
       <% else %>
         <table width="100%" class="striped">
@@ -44,7 +44,7 @@
 
     <section>
       <h2>Tag Aliases</h2>
-      <% if @meta_search.tag_aliases.blank? %>
+      <% if @meta_search.tag_aliases.empty? %>
         <p>No results</p>
       <% else %>
         <table width="100%" class="striped">
@@ -80,7 +80,7 @@
 
     <section>
       <h2>Tag Implications</h2>
-      <% if @meta_search.tag_implications.blank? %>
+      <% if @meta_search.tag_implications.empty? %>
         <p>No results</p>
       <% else %>
         <table width="100%" class="striped">

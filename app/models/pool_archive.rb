@@ -4,6 +4,7 @@ class PoolArchive < ApplicationRecord
   before_validation :fill_version, on: :create
   before_validation :fill_changes, on: :create
 
+  #establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
   self.table_name = "pool_versions"
 
   module SearchMethods

@@ -32,6 +32,10 @@ module PostSets
       false
     end
 
+    def best_post
+      nil
+    end
+
     def fill_tag_types(posts)
       tag_array = []
       posts.each do |p|

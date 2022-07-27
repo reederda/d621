@@ -10,18 +10,18 @@ module Danbooru
     # The name of this Danbooru.
     def app_name
       if CurrentUser.safe_mode?
-        "e926"
+        "derg926"
       else
-        "e621"
+        "derg621"
       end
     end
 
     def description
-      "Find good furry art, fast"
+      "Find dragons fast"
     end
 
     def domain
-      "e621.net"
+      "d621.windstryke.net"
     end
 
     # Force rating:s on this version of the site.
@@ -69,6 +69,14 @@ module Danbooru
       "#{source_code_url}/commit/#{hash}"
     end
 
+    def releases_url
+      "#{source_code_url}/releases"
+    end
+
+    def issues_url
+      "#{source_code_url}/issues"
+    end
+
     # Stripped of any special characters.
     def safe_app_name
       app_name.gsub(/[^a-zA-Z0-9_-]/, "_")
@@ -96,13 +104,7 @@ module Danbooru
     # Set the default level, permissions, and other settings for new users here.
     def customize_new_user(user)
       user.comment_threshold = -10 unless user.will_save_change_to_comment_threshold?
-      user.blacklisted_tags = 'gore
-scat
-watersports
-young -rating:s
-loli
-shota
-fart'
+      user.blacklisted_tags = ''
       true
     end
 
@@ -202,10 +204,6 @@ fart'
       15
     end
 
-    def forum_vote_limit
-      50
-    end
-
     # Blips created in the last hour
     def blip_limit
       25
@@ -214,11 +212,6 @@ fart'
     # Artists creator or edited in the last hour
     def artist_edit_limit
       25
-    end
-
-    # Wiki pages created or edited in the last hour
-    def wiki_edit_limit
-      60
     end
 
     # Notes applied to posts edited or created in the last hour
@@ -279,6 +272,10 @@ fart'
     def tag_type_change_cutoff
       100
     end
+    # Determines who can see ads.
+    def can_see_ads?(user)
+      !user.is_privileged?
+    end
 
     # Users cannot search for more than X regular tags at a time.
     def base_tag_query_limit
@@ -315,10 +312,6 @@ fart'
       50_000
     end
     
-    def forum_post_max_size
-      50_000
-    end
-    
     def note_max_size
       1_000
     end
@@ -339,10 +332,6 @@ fart'
       50_000
     end
     
-    def wiki_page_max_size
-      250_000
-    end
-
     def beta_notice?
       false
     end
@@ -639,14 +628,6 @@ fart'
       nil
     end
 
-    def flag_notice_wiki_page
-      "help:flag_notice"
-    end
-
-    def replacement_notice_wiki_page
-      "help:replacement_notice"
-    end
-
     # The number of posts displayed per page.
     def posts_per_page
       20
@@ -797,14 +778,12 @@ fart'
     def mascots
       [
           ["https://static1.e621.net/data/mascot_bg/esix1.jpg", "#012e56", "<a href='http://www.furaffinity.net/user/keishinkae'>Keishinkae</a>"],
-          ["https://static1.e621.net/data/mascot_bg/esix2.jpg", "#012e56", "<a href='http://www.furaffinity.net/user/keishinkae'>Keishinkae</a>"],
-          ["https://static1.e621.net/data/mascot_bg/raptor1.jpg", "#012e56", "<a href='http://nowhereincoming.net/'>darkdoomer</a>"],
-          ["https://static1.e621.net/data/mascot_bg/hexerade.jpg", "#002d55", "<a href='http://www.furaffinity.net/user/chizi'>chizi</a>"],
-          ["https://static1.e621.net/data/mascot_bg/wiredhooves.jpg", "#012e56", "<a href='http://www.furaffinity.net/user/wiredhooves'>wiredhooves</a>"],
-          ["https://static1.e621.net/data/mascot_bg/ecmajor.jpg", "#012e57", "<a href='http://www.horsecore.org/'>ECMajor</a>"],
-          ["https://static1.e621.net/data/mascot_bg/evalionfix.jpg", "#012e57", "<a href='http://www.furaffinity.net/user/evalion'>evalion</a>"],
-          ["https://static1.e621.net/data/mascot_bg/peacock.png", "#012e57", "<a href='http://www.furaffinity.net/user/ratte'>Ratte</a>"]
+          ["https://static1.e621.net/data/mascot_bg/evalionfix.jpg", "#012e57", "<a href='http://www.furaffinity.net/user/evalion'>evalion</a>"]
       ]
+    end
+
+    def metrika_enabled?
+      false
     end
 
     # Additional video samples will be generated in these dimensions if it makes sense to do so

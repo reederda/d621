@@ -142,9 +142,6 @@
     <%= yield :layout %>
   </div>
 
-  <% if CurrentUser.is_anonymous? %>
-    <%= render "static/guest_warning" %>
-  <% end %>
   <%= render "static/footer" %>
   <%= render "static/deferred_posts" %>
 <% end %>

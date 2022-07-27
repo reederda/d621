@@ -58,8 +58,8 @@ class Post < ApplicationRecord
   has_many :favorites
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating,
-                :do_not_version_changes, :tag_string_diff, :source_diff, :edit_reason
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning,
+                :view_count, :do_not_version_changes, :tag_string_diff, :source_diff, :edit_reason
 
   has_many :versions, -> {order("post_versions.id ASC")}, :class_name => "PostArchive", :dependent => :destroy
 
@@ -76,6 +76,10 @@ class Post < ApplicationRecord
 
         Danbooru.config.storage_manager.delete_post_files(md5, file_ext)
       end
+    end
+
+    def queue_delete_files(grace_period)
+      DeletePostFilesJob.set(wait: grace_period).perform_later(id, md5, file_ext)
     end
 
     def delete_files
@@ -282,6 +286,22 @@ class Post < ApplicationRecord
       end
     end
 
+    def image_width_for(user)
+      if user.default_image_size == "large"
+        large_image_width
+      else
+        image_width
+      end
+    end
+
+    def image_height_for(user)
+      if user.default_image_size == "large"
+        large_image_height
+      else
+        image_height
+      end
+    end
+
     def resize_percentage
       100 * large_image_width.to_f / image_width.to_f
     end
@@ -317,6 +337,10 @@ class Post < ApplicationRecord
       PostEvent.add(id, CurrentUser.user, :approved)
       update(approver: approver, is_flagged: false, is_pending: false, is_deleted: false)
       approv
+    end
+
+    def disapproval_by(user)
+      PostDisapproval.where(user_id: user.id, post_id: id).first
     end
   end
 
@@ -429,20 +453,19 @@ class Post < ApplicationRecord
     end
 
     def decrement_tag_post_counts
-      Tag.decrement_post_counts(tag_array)
-    end
-
-    def increment_tag_post_counts
-      Tag.increment_post_counts(tag_array)
+      Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
     end
 
     def update_tag_post_counts
-      return if is_deleted?
-
       decrement_tags = tag_array_was - tag_array
+
       increment_tags = tag_array - tag_array_was
-      Tag.increment_post_counts(increment_tags)
-      Tag.decrement_post_counts(decrement_tags)
+      if increment_tags.any?
+        Tag.increment_post_counts(increment_tags)
+      end
+      if decrement_tags.any?
+        Tag.decrement_post_counts(decrement_tags)
+      end
     end
 
     def set_tag_count(category, tagcount)
@@ -855,6 +878,10 @@ class Post < ApplicationRecord
 
 
   module FavoriteMethods
+    def clean_fav_string?
+      true
+    end
+
     def clean_fav_string!
       array = fav_string.split.uniq
       self.fav_string = array.join(" ")
@@ -978,6 +1005,10 @@ class Post < ApplicationRecord
       pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
     end
 
+    def belongs_to_pool_with_id?(pool_id)
+      pool_string =~ /(?:\A| )pool:#{pool_id}(?:\Z| )/
+    end
+
     def add_pool!(pool, force = false)
       return if belongs_to_pool?(pool)
       return if pool.is_deleted? && !force
@@ -1004,6 +1035,10 @@ class Post < ApplicationRecord
   end
 
   module VoteMethods
+    def can_be_voted_by?(user)
+      !PostVote.exists?(:user_id => user.id, :post_id => id)
+    end
+
     def own_vote(user = CurrentUser.user)
       return nil unless user
       votes.where('user_id = ?', user.id).first
@@ -1256,11 +1291,10 @@ class Post < ApplicationRecord
           end
 
           update(
-            is_deleted: true,
-            is_pending: false,
-            is_flagged: false
+              is_deleted: true,
+              is_pending: false,
+              is_flagged: false
           )
-          decrement_tag_post_counts
           move_files_on_delete
           PostEvent.add(id, CurrentUser.user, :deleted, { reason: reason })
         end
@@ -1293,18 +1327,13 @@ class Post < ApplicationRecord
       transaction do
         self.is_deleted = false
         self.approver_id = CurrentUser.id
-        flags.each { |x| x.resolve! }
-        increment_tag_post_counts
+        flags.each {|x| x.resolve!}
         save
         approvals.create(user: CurrentUser.user)
         PostEvent.add(id, CurrentUser.user, :undeleted)
       end
       move_files_on_undelete
       UserStatus.for_user(uploader_id).update_all("post_deleted_count = post_deleted_count - 1")
-    end
-
-    def deletion_flag
-      flags.order(id: :desc).first
     end
   end
 

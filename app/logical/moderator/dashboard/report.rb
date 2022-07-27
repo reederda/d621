@@ -47,12 +47,6 @@ module Moderator
           Queries::UserFeedback.all
         end
       end
-
-      def wiki_pages
-        ApplicationRecord.without_timeout do
-          Queries::WikiPage.all(min_date, max_level)
-        end
-      end
     end
   end
 end

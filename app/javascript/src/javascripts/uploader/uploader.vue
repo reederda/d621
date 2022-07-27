@@ -42,7 +42,6 @@
                     <div class="col">
                         <label class="section-label" for="names">Artists</label>
                         <div><a href="/forum_topics/23553">How do I tag an artist?</a></div>
-                        <div>Please don't use <a href="/wiki_pages/anonymous_artist">anonymous_artist</a> or <a href="/wiki_pages/unknown_artist">unknown_artist</a> tags unless they fall under those definitions on the wiki.</div>
                     </div>
                     <div class="col2">
                         <div>
@@ -54,13 +53,6 @@
                 <div class="flex-grid border-bottom">
                     <div class="col">
                         <label class="section-label" for="post_sex_tags">Characters</label>
-                        <div>
-                            Select (and write in) all that apply. Character sex is based only on what is visible in the
-                            image.
-                        </div>
-                        <div><a href="/wiki_pages/tag_what_you_see">
-                            Outside information or other images should not be used when deciding what tags are used.
-                        </a></div>
                     </div>
                     <div class="col2">
                         <div class="flex-wrap">
@@ -105,7 +97,7 @@
                     <div class="col">
                         <label class="section-label">Contentious Content</label>
                         <div>
-                            Fetishes or subjects that other users may find extreme or objectionable.
+                            Subjects that others may find extreme or objectionable.
                             These allow users to find or blacklist content with ease. Make sure that you are tagging
                             these upon initial upload.
                         </div>
@@ -113,14 +105,14 @@
                     <div class="col2">
           <textarea class="tag-textarea" v-model="tagEntries.theme" id="post_themes" rows="2"
                     data-autocomplete="tag-edit"
-                    placeholder="Ex: cub young gore scat watersports diaper my_little_pony vore not_furry rape hyper etc."></textarea>
+                    placeholder="Ex: nsfw etc."></textarea>
                     </div>
                 </div>
             </template>
             <div class="flex-grid border-bottom">
                 <div class="col">
                     <label class="section-label">Rating</label>
-                    <div>Explicit tags include sex, pussy, penis, masturbation, fellatio, etc.
+                    <div>
                         (<a href="/help/ratings" target="_blank">help</a>)
                     </div>
                 </div>
@@ -134,10 +126,10 @@
                                 Explicit
                             </button>
                             <button class="toggle-button rating-q" :class="{active: rating==='q'}" @click="rating = 'q'">
-                                Questionable
+                                Mature
                             </button>
                         </template>
-                        <button class="toggle-button rating-s" :class="{active: rating==='s'}" @click="rating = 's'">Safe
+                        <button class="toggle-button rating-s" :class="{active: rating==='s'}" @click="rating = 's'">Sfw
                         </button>
                     </div>
                 </div>

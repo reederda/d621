@@ -69,12 +69,9 @@
           <% else %>
             <%= link_to "Login/Signup", new_session_path, title: "Login or sign up" %>
           <% end %>
-          <%= link_to "Posts", posts_path, title: "A paginated list of every post" %>
-          <%= link_to "Comments", comments_path, title: "A paginated list of every comment" %>
+          <%= link_to "Images", posts_path, title: "A paginated list of every image" %>
           <%= link_to "Tags", tags_path, title: "A paginated list of every tag" %>
-          <%= link_to "Wiki", wiki_pages_path, title: "Wiki" %>
-          <%= link_to "Forum", forum_topics_path, title: "Forum" %>
-          <%= link_to "&raquo;".html_safe, site_map_path, title: "A site map" %>
+          <!--<%= link_to "&raquo;".html_safe, site_map_path, title: "A site map" %>-->
         </div>
         <div>
           <%= form_tag(posts_path, method: "get") do %>
@@ -97,12 +94,7 @@
 
     <div id='searchbox3' class='mascotbox'>
       <p>
-        Serving <%= number_with_delimiter Post.fast_count %> posts<br/>
-        <%= link_to "Takedown Policy and Process", takedown_static_path, title: "Takedown Information" %>
-        |
-        <%= link_to "Contact Us", contact_path, title: "Contact Us" %> |
-        <%= link_to "Terms of Service", terms_of_service_path, title: "Terms of Service" %> |
-        <%= link_to "Privacy", privacy_policy_path, title: "Privacy Policy" %>
+        Serving <%= number_with_delimiter Post.fast_count %> images<br/>
       </p>
     </div>
 

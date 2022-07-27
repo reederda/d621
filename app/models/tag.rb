@@ -1,4 +1,5 @@
 class Tag < ApplicationRecord
+  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
   COUNT_METATAGS = %w[
     comment_count
     note_count
@@ -82,16 +83,18 @@ class Tag < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def increment_post_counts(tag_names)
-        return if tag_names.empty?
+      def highest_post_count
+        Cache.get("highest-post-count", 4.hours) do
+          select("post_count").order("post_count DESC").first.post_count
+        end
+      end
 
+      def increment_post_counts(tag_names)
         Tag.where(name: tag_names).order(:name).lock("FOR UPDATE").pluck(1)
         Tag.where(name: tag_names).update_all("post_count = post_count + 1")
       end
 
       def decrement_post_counts(tag_names)
-        return if tag_names.empty?
-
         Tag.where(name: tag_names).order(:name).lock("FOR UPDATE").pluck(1)
         Tag.where(name: tag_names).update_all("post_count = post_count - 1")
       end
@@ -260,6 +263,10 @@ class Tag < ApplicationRecord
   module NameMethods
     def normalize_name(name)
       name.to_s.unicode_normalize(:nfc).downcase.strip.tr(" ", "_").to_s
+    end
+
+    def create_for_list(names)
+      find_or_create_by_name_list(names).map(&:name)
     end
 
     def find_by_normalized_name(name)

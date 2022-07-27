@@ -22,6 +22,7 @@ gem 'bootsnap'
 gem 'addressable'
 gem 'httparty'
 gem 'recaptcha', require: "recaptcha/rails"
+gem 'jquery-rails'
 gem 'webpacker', '>= 4.0.x'
 gem 'retriable'
 gem 'sidekiq'

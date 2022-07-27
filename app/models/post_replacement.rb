@@ -4,7 +4,7 @@ class PostReplacement < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader_on_approve, class_name: "User", foreign_key: :uploader_id_on_approve, optional: true
-  attr_accessor :replacement_file, :replacement_url, :tags, :is_backup
+  attr_accessor :replacement_file, :replacement_url, :final_source, :tags, :is_backup
 
   validate :user_is_not_limited, on: :create
   validate :post_is_valid, on: :create
@@ -308,8 +308,9 @@ class PostReplacement < ApplicationRecord
     end
   end
 
-  def original_file_visible_to?(user)
-    user.is_janitor?
+  def file_visible_to?(user)
+    return true if user.is_janitor?
+    false
   end
 
   include ApiMethods
@@ -318,4 +319,5 @@ class PostReplacement < ApplicationRecord
   include ProcessingMethods
   include PromotionMethods
   include PostMethods
+
 end

@@ -30,6 +30,10 @@ class UploadService
       end
     end
 
+    def is_downloadable?(source)
+      source =~ /^https?:\/\//
+    end
+
     def generate_resizes(file, upload)
       PostThumbnailer.generate_resizes(file, upload.image_height, upload.image_width, upload.is_video? ? :video : :image)
     end

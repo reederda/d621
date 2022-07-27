@@ -379,11 +379,6 @@ Rails.application.routes.draw do
   get "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   get "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
 
-  get "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  get "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  get "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
-  get "/forum/search" => redirect("/forum_posts/search")
-
   get "/help/show/:title" => redirect("/help/%{title}")
 
   get "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
@@ -404,9 +399,6 @@ Rails.application.routes.draw do
   get "/post/moderate" => redirect("/moderator/post/queue")
   get "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
   get "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
-  get "/post/popular_by_day" => redirect("/explore/posts/popular")
-  get "/post/popular_by_week" => redirect("/explore/posts/popular")
-  get "/post/popular_by_month" => redirect("/explore/posts/popular")
   get "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
   get "/post/show/:id" => redirect("/posts/%{id}")
   get "/post/show" => redirect {|params, req| "/posts?md5=#{req.params[:md5]}"}
@@ -431,14 +423,6 @@ Rails.application.routes.draw do
   get "/user/show/:id" => redirect("/users/%{id}")
   get "/user/login" => redirect("/session/new")
   get "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
-
-  get "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  get "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  get "/wiki/rename" => redirect("/wiki_pages")
-  get "/wiki/show/:title" => redirect("/wiki_pages/%{title}")
-  get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
-  get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
-  get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/site_map" => "static#site_map", :as => "site_map"

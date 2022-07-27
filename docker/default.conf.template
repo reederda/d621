@@ -16,9 +16,9 @@ server {
   location /data {
     # if you want to block hotlinking
     valid_referers none ${NGINX_HOST} ~\.google\. ~\.bing\. ~\.yahoo\.;
-    if ($invalid_referer) {
-      return 403;
-    }
+#    if ($invalid_referer) {
+#      return 403;
+#    }
     rewrite ^/data/sample/__.+?__(.+) /data/sample/$1 last;
     rewrite ^/data/__.+?__(.+) /data/$1 last;
     expires max;

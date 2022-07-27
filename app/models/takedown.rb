@@ -134,6 +134,10 @@ class Takedown < ApplicationRecord
       self.post_ids = temp_post_ids.join(' ')
     end
 
+    def self.validated_posts(ids)
+      Post.select(:id).where(id: ids).map {|x| x.id}
+    end
+
     def del_post_array
       del_post_ids.scan(/\d+/).map(&:to_i)
     end

@@ -9,6 +9,8 @@ class TagRelationship < ApplicationRecord
   belongs_to :forum_topic, optional: true
   belongs_to :antecedent_tag, class_name: "Tag", foreign_key: "antecedent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(antecedent_name) }
   belongs_to :consequent_tag, class_name: "Tag", foreign_key: "consequent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(consequent_name) }
+  has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
+  has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
   scope :active, ->{approved}
   scope :approved, ->{where(status: %w[active processing queued])}
@@ -135,11 +137,11 @@ class TagRelationship < ApplicationRecord
       end
 
       if params[:antecedent_tag_category].present?
-        q = q.joins(:antecedent_tag).where("antecedent_tag.category": params[:antecedent_tag_category])
+        q = q.joins(:antecedent_tag).where("tags.category": params[:antecedent_tag_category])
       end
 
       if params[:consequent_tag_category].present?
-        q = q.joins(:consequent_tag).where("consequent_tag.category": params[:consequent_tag_category])
+        q = q.joins(:consequent_tag).where("tags.category": params[:consequent_tag_category])
       end
 
       if params[:creator_name].present?
@@ -160,9 +162,9 @@ class TagRelationship < ApplicationRecord
 
       case params[:order]
       when "created_at"
-        q = q.order("#{table_name}.created_at desc nulls last, #{table_name}.id desc")
+        q = q.order("created_at desc nulls last, id desc")
       when "updated_at"
-        q = q.order("#{table_name}.updated_at desc nulls last, #{table_name}.id desc")
+        q = q.order("updated_at desc nulls last, id desc")
       when "name"
         q = q.order("antecedent_name asc, consequent_name asc")
       when "tag_count"
@@ -195,6 +197,10 @@ class TagRelationship < ApplicationRecord
 
     def retirement_message
       "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been retired."
+    end
+
+    def date_timestamp
+      Time.now.strftime("%Y-%m-%d")
     end
 
     def forum_link
